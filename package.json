@@ -1,0 +1,17 @@
+{
+  "name": "olive-fruit",
+  "version": "0.1.0",
+  "dependencies": {
+    "coffee-script": "~1.7.1",
+    "async": "~0.2.10",
+    "node-uuid": "~1.4.1",
+		"request": "~2.33.0",
+		"geoip-lite": "~1.1.3"
+  },
+  "scripts":{
+      "preinstall": "bash deps.sh"
+  },
+  "engines": {
+      "node": "0.10.22"
+  }
+}
