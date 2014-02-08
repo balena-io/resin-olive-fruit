@@ -8,7 +8,7 @@ geoip = require('geoip-lite')
 {spawn} = require('child_process')
 
 INTERVAL = 1000*60
-ENTRYPOINT = 'http://thomporter-nodejs-77230.use1.nitrousbox.com/api/v1/photo-upload'
+ENTRYPOINT = 'http://thomporter-nodejs-77230.use1.nitrousbox.com/api/v1/photos'
 
 # load demo data
 demo = JSON.parse((fs.readFileSync('demo.json', 'utf8')))
