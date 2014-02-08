@@ -86,9 +86,11 @@ async.forever(
 
 				form = req.form()
 				form.append('photo', fs.createReadStream(photo)
-				form.append('farm_id', data.farm_id)
-				form.append('camera_id', data.camera_id)
-				form.append('photo_id', photo_id)
+				form.append('farm', data.farm_id)
+				form.append('camera', data.camera_id)
+				# note - the photo_id must be set by the server - it can not be set from here.
+				# if you need it, you can get it from the response when you post....
+				#form.append('photo_id', photo_id)
 				form.append('timestamp', Date.now())
 				form.append('gps_location', data.gps_location.join(','))
 		)
