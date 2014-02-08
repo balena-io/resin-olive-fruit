@@ -1,3 +1,4 @@
+fs = require('fs')
 os = require('os')
 path = require('path')
 async = require('async')
@@ -6,8 +7,23 @@ request = require('request')
 geoip = require('geoip-lite')
 {spawn} = require('child_process')
 
-INTERVAL = 1000#*60
+INTERVAL = 1000*60
 ENTRYPOINT = 'http://thomporter-nodejs-77230.use1.nitrousbox.com/api/v1/photo-upload'
+
+# load demo data
+demo = JSON.parse((fs.readFileSync('demo.json', 'utf8')))
+
+getRandomElement = (arr) ->
+  return arr[Math.floor(Math.random()*arr.length)]
+
+getRandomData = (data) ->
+	farm = getRandomElement(data)
+	camera = getRandomElement(farm.cameras)
+	return {
+		farm_id: farm.id
+		camera_id: farm.id + camera.id
+		gps_location: camera.ll
+	}
 
 getPhoto = (callback) ->
 	id = uuid.v4()
@@ -50,9 +66,31 @@ async.forever(
 			if error?
 				callback(error)
 			else
-				#curl -i -X POST -F "photo=@/root/$uuid.jpg" -F 'farm_id=fg5Gh8sQ3nng3hsW3tr4s' -F 'camera_id=xg5Gh8sQ3nn25hsW3tr4s' -F 'photo_id=$uuid' -F 'timestamp=2014-02-08T03:35:26.723Z' -F 'gps_location=38.239259,-85.735073' 'http://thomporter-nodejs-77230.use1.nitrousbox.com/api/v1/photo-upload'
+				[[photo_id, photo]] = results
+				data = getRandomData(demo)
+
 				console.dir results
-				setTimeout(callback, INTERVAL, null)
+				console.dir data
+
+				req = request.post(ENTRYPOINT, (error, response, body) ->
+					if error?
+						callback(error)
+						return
+
+					if response.statusCode != 200
+						callback('Server returned '+response.statusCode)
+						return
+
+					setTimeout(callback, INTERVAL, null)
+				)
+
+				form = req.form()
+				form.append('photo', fs.createReadStream(photo)
+				form.append('farm_id', data.farm_id)
+				form.append('camera_id', data.camera_id)
+				form.append('photo_id', photo_id)
+				form.append('timestamp', Date.now())
+				form.append('gps_location', data.gps_location.join(','))
 		)
 
 	(error) ->
