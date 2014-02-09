@@ -14,7 +14,7 @@ ENTRYPOINT = 'http://thomporter-nodejs-77230.use1.nitrousbox.com/api/v1/photos'
 demo = JSON.parse((fs.readFileSync('demo.json', 'utf8')))
 
 getRandomElement = (arr) ->
-  return arr[Math.floor(Math.random()*arr.length)]
+	return arr[Math.floor(Math.random()*arr.length)]
 
 getRandomData = (data) ->
 	farm = getRandomElement(data)
@@ -26,8 +26,7 @@ getRandomData = (data) ->
 	}
 
 getPhoto = (callback) ->
-	id = uuid.v4()
-	photo = path.join(os.tmpdir(), id+'.jpg')
+	photo = path.join(os.tmpdir(), uuid.v4()+'.jpg')
 
 	raspistill = spawn('echo', [photo])
 	#raspistill = spawn('raspistill', ['-o', photo])
@@ -36,7 +35,7 @@ getPhoto = (callback) ->
 	)
 	raspistill.on('exit', (code) ->
 		if code == 0
-			callback(null, id, photo)
+			callback(null, photo)
 		else
 			callback('raspistill exited with code '+code)
 	)
@@ -66,7 +65,7 @@ async.forever(
 			if error?
 				callback(error)
 			else
-				[[photo_id, photo]] = results
+				[[photo]] = results
 				data = getRandomData(demo)
 
 				console.dir results
@@ -85,12 +84,9 @@ async.forever(
 				)
 
 				form = req.form()
-				form.append('photo', fs.createReadStream(photo)
+				form.append('photo', fs.createReadStream(photo))
 				form.append('farm', data.farm_id)
 				form.append('camera', data.camera_id)
-				# note - the photo_id must be set by the server - it can not be set from here.
-				# if you need it, you can get it from the response when you post....
-				#form.append('photo_id', photo_id)
 				form.append('timestamp', Date.now())
 				form.append('gps_location', data.gps_location.join(','))
 		)
